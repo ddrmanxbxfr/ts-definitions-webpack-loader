@@ -1,0 +1,19 @@
+{
+  "name": "ts-definitions-webpack-loader",
+  "version": "0.0.1",
+  "description": "Webpack loader to generate typescript definitions file",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "typescript",
+    "webpack",
+    "lib",
+    "js",
+    "definitions",
+    ".d.ts"
+  ],
+  "author": "Mathieu Rheaume <mrheaume@cortex.bz>",
+  "license": "GPL-3.0"
+}

@@ -17,10 +17,10 @@
 import { CompilationResult, CompilationUnit } from './TypescriptService';
 import FileUtils from './FileUtils';
 var compileResults: Array<CompilationResult> = new Array();
-var concatPath = "";
+var concatPath: string = "";
 
 function typescriptDefinitionsLoader(source) {
-  var filePath = this.resourcePath;
+  var filePath: string = this.resourcePath;
   concatPath = this.query.split("=")[1];
   compileResults.push(CompilationUnit.fetchDefinition(filePath));
 
@@ -32,7 +32,7 @@ function typescriptDefinitionsLoader(source) {
 
 function afterCompileHandler(compilation: any, callback: any) {
   var files: Array<string> = new Array();
-  var results = compileResults.length
+  var results: number = compileResults.length
   if (results > 0) {
     for (var i = 0; i < results; ++i) {
       files.push(compileResults[i].filePath);

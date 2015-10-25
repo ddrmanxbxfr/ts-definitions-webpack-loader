@@ -42,7 +42,8 @@ var TypescriptService;
         function CompilationUnit() {
         }
         CompilationUnit.fetchDefinition = function (filePath) {
-            var output = CompilationUnit.getService(filePath).getEmitOutput(filePath);
+            var service = CompilationUnit.getService(filePath);
+            var output = service.getEmitOutput(filePath);
             if (!output.emitSkipped) {
                 console.log(colors.green("TS Definitions : Emitting " + filePath));
                 var definition = output.outputFiles.filter(function (file) { return !!file.name.match(/\.d\.ts(x?)$/); }).pop();
@@ -53,10 +54,26 @@ var TypescriptService;
             }
             else {
                 console.log(colors.red("TS Definition : Emitting " + filePath + " failed"));
+                CompilationUnit.logErrors(service, filePath);
             }
             return new CompilationResult(filePath, false);
         };
         ;
+        CompilationUnit.logErrors = function (services, fileName) {
+            var allDiagnostics = services.getCompilerOptionsDiagnostics()
+                .concat(services.getSyntacticDiagnostics(fileName))
+                .concat(services.getSemanticDiagnostics(fileName));
+            allDiagnostics.forEach(function (diagnostic) {
+                var message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+                if (diagnostic.file) {
+                    var _a = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start), line = _a.line, character = _a.character;
+                    console.log(colors.red("  Error " + diagnostic.file.fileName + " (" + (line + 1) + "," + (character + 1) + "): " + message));
+                }
+                else {
+                    console.log(colors.red("  Error: " + message));
+                }
+            });
+        };
         CompilationUnit.getService = function (fileName) {
             var servicesHost = {
                 getScriptFileNames: function () { return [fileName]; },

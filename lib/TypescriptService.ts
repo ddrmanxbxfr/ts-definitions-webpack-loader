@@ -33,7 +33,8 @@ module TypescriptService {
 
   export class CompilationUnit {
     public static fetchDefinition(filePath: string): CompilationResult {
-      var output = CompilationUnit.getService(filePath).getEmitOutput(filePath);
+      var service = CompilationUnit.getService(filePath)
+      var output = service.getEmitOutput(filePath);
 
       if (!output.emitSkipped) {
         console.log(colors.green(`TS Definitions : Emitting ${filePath}`));
@@ -46,45 +47,63 @@ module TypescriptService {
       }
       else {
         console.log(colors.red(`TS Definition : Emitting ${filePath} failed`));
+        CompilationUnit.logErrors(service, filePath);
       }
 
       return new CompilationResult(filePath, false);
     };
 
-    private static options: typescript.CompilerOptions = {
-      noEmitOnError: true,
-      noImplicitAny: true,
-      target: typescript.ScriptTarget.ES5,
-      module: typescript.ModuleKind.CommonJS,
-      declaration: true,
-      removeComments: true
-    };
+    private static logErrors(services: typescript.LanguageService, fileName: string): void {
+      let allDiagnostics = services.getCompilerOptionsDiagnostics()
+      .concat(services.getSyntacticDiagnostics(fileName))
+      .concat(services.getSemanticDiagnostics(fileName));
 
-    // Create the language service host to allow the LS to communicate with the host
-    private static files: typescript.Map<{ version: number }> = {};
+      allDiagnostics.forEach(diagnostic => {
+        let message = typescript.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+        if (diagnostic.file) {
+          let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+          console.log(colors.red(`  Error ${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`));
+        }
+        else {
+          console.log(colors.red(`  Error: ${message}`));
+        }
+      });
+    }
 
-    private static getService(fileName: string): typescript.LanguageService {
-      const servicesHost: typescript.LanguageServiceHost = {
-      getScriptFileNames: () => [fileName],
-      getScriptVersion: (fileName) => CompilationUnit.files[fileName] &&
-        CompilationUnit.files[fileName].version.toString(),
-        getScriptSnapshot: (fileName) => {
-          if (!fs.existsSync(fileName)) {
-            return undefined;
-          }
-
-          return typescript.ScriptSnapshot.fromString(fs.readFileSync(fileName).toString());
-        },
-        getCurrentDirectory: () => process.cwd(),
-        getCompilationSettings: () => CompilationUnit.options,
-        getDefaultLibFileName: (options) => typescript.getDefaultLibFilePath(options),
+      private static options: typescript.CompilerOptions = {
+        noEmitOnError: true,
+        noImplicitAny: true,
+        target: typescript.ScriptTarget.ES5,
+        module: typescript.ModuleKind.CommonJS,
+        declaration: true,
+        removeComments: true
       };
 
-      // Create the language service files
-      return typescript.createLanguageService(servicesHost,
-      typescript.createDocumentRegistry());
-    };
-  }
-}
+      // Create the language service host to allow the LS to communicate with the host
+      private static files: typescript.Map<{ version: number }> = {};
 
-export = TypescriptService;
+      private static getService(fileName: string): typescript.LanguageService {
+        const servicesHost: typescript.LanguageServiceHost = {
+        getScriptFileNames: () => [fileName],
+        getScriptVersion: (fileName) => CompilationUnit.files[fileName] &&
+          CompilationUnit.files[fileName].version.toString(),
+          getScriptSnapshot: (fileName) => {
+            if (!fs.existsSync(fileName)) {
+              return undefined;
+            }
+
+            return typescript.ScriptSnapshot.fromString(fs.readFileSync(fileName).toString());
+          },
+          getCurrentDirectory: () => process.cwd(),
+          getCompilationSettings: () => CompilationUnit.options,
+          getDefaultLibFileName: (options) => typescript.getDefaultLibFilePath(options),
+        };
+
+        // Create the language service files
+        return typescript.createLanguageService(servicesHost,
+        typescript.createDocumentRegistry());
+      };
+    }
+  }
+
+  export = TypescriptService;

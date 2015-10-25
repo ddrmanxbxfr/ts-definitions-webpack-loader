@@ -12,9 +12,14 @@ var FileUtils = (function () {
         fs.writeFileSync(distPath, out.join('\n'), 'utf-8');
         console.log(colors.green('TS Definitions : ' + distPath + ' definitions built.'));
     };
+    FileUtils.endsWith = function (str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    };
     FileUtils.deleteMultiple = function (items) {
         for (var i = 0; i < items.length; ++i) {
-            fs.unlinkSync(items[i]);
+            if (FileUtils.endsWith(items[i], ".d.ts")) {
+                fs.unlinkSync(items[i]);
+            }
         }
     };
     return FileUtils;

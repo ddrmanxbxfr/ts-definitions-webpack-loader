@@ -26,9 +26,15 @@ export default class FileUtils {
     console.log(colors.green('TS Definitions : '+ distPath +' definitions built.'));
   }
 
+  private static endsWith(str: string, suffix: string): boolean {
+    return str.indexOf(suffix, str.length - suffix.length) !== -1;
+  }
+
   public static deleteMultiple(items: Array<string>): void {
     for (var i = 0; i < items.length; ++i) {
-      fs.unlinkSync(items[i]);
+      if (FileUtils.endsWith(items[i], ".d.ts")) {
+        fs.unlinkSync(items[i]);
+      }
     }
   }
 }

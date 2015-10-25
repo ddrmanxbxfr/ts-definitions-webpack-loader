@@ -4,6 +4,28 @@ A webpack plugin to generate and pack together typescript definitions.
 
 Mostly used when writing a typescript library and want a clean single definition output.
 
+# Usage
+
+You will need to include the following in your webpack config as a loader.
+
+The output query parameter must be set to get the packer running correctly.
+
+We concat all the definitions files in there...
+
+```
+module.exports = {
+  module: {
+    {
+      test: /\/.ts$/,
+      exclude: /node_modules/,
+      loader: 'ts-definitions-webpack-loader?output=dist/a_definition_file.d.ts'
+    }
+  }
+}
+
+
+````
+
 # License
 
 Copyright (C) 2015 Mathieu Rhéaume <mathieu@codingrhemes.com>

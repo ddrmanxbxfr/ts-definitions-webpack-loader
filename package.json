@@ -1,10 +1,10 @@
 {
   "name": "ts-definitions-webpack-loader",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "Webpack loader to generate typescript definitions file",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc lib/index.ts --outDir dist --target ES5 --module commonjs --removeComments"
   },
   "keywords": [
     "typescript",
@@ -14,6 +14,12 @@
     "definitions",
     ".d.ts"
   ],
-  "author": "Mathieu Rheaume <mrheaume@cortex.bz>",
-  "license": "GPL-3.0"
+  "author": "Mathieu Rheaume <mathieu@codingrhemes.com>",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "concat-files": "^0.1.0",
+    "tsd": "^0.6.5",
+    "typescript": "^1.6.2"
+  }
 }

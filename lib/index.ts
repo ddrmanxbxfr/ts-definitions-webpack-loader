@@ -22,7 +22,10 @@ var concatPath: string = "";
 function typescriptDefinitionsLoader(source) {
   var filePath: string = this.resourcePath;
   concatPath = this.query.split("=")[1];
-  compileResults.push(CompilationUnit.fetchDefinition(filePath));
+  var result: CompilationResult = CompilationUnit.fetchDefinition(filePath);
+  if (result.compileStatus) {
+    compileResults.push(result);
+  }
 
   this._compiler.plugin("after-compile",
                         afterCompileHandler);

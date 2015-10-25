@@ -20,7 +20,10 @@ var concatPath = "";
 function typescriptDefinitionsLoader(source) {
     var filePath = this.resourcePath;
     concatPath = this.query.split("=")[1];
-    compileResults.push(TypescriptService_1.CompilationUnit.fetchDefinition(filePath));
+    var result = TypescriptService_1.CompilationUnit.fetchDefinition(filePath);
+    if (result.compileStatus) {
+        compileResults.push(result);
+    }
     this._compiler.plugin("after-compile", afterCompileHandler);
     return source;
 }

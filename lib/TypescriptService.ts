@@ -37,15 +37,15 @@ module TypescriptService {
 
       if (!output.emitSkipped) {
         console.log(colors.green(`TS Definitions : Emitting ${filePath}`));
+
+        var definition = output.outputFiles.filter(file => !!file.name.match(/\.d\.ts(x?)$/)).pop();
+        if (definition) { 
+          fs.writeFileSync(definition.name, definition.text, "utf8");
+          return new CompilationResult(definition.name, true);
+        }
       }
       else {
         console.log(colors.red(`TS Definition : Emitting ${filePath} failed`));
-      }
-
-      var definition = output.outputFiles.filter(file => !!file.name.match(/\.d\.ts(x?)$/)).pop();
-      if (definition) { 
-        fs.writeFileSync(definition.name, definition.text, "utf8");
-        return new CompilationResult(definition.name, true);
       }
 
       return new CompilationResult(filePath, false);
